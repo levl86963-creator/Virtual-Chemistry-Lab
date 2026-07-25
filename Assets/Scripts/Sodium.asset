@@ -18,6 +18,8 @@ MonoBehaviour:
   protons: 11
   neutrons: 12
   electrons: 11
-  displayColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  elementGroup: 0
+  displayColor: {r: 0.95686275, g: 0.24705882, b: 0.36862745, a: 1}
+  isImplemented: 1
   funFact: Sodium reacts violently with water
   atomModelPrefab: {fileID: 0}

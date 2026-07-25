@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -19.52907, y: 16.70784, z: 31.6823}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 0.06, y: 0.06, z: 0.06}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5498795578306992528}
@@ -136,14 +136,21 @@ MonoBehaviour:
   shell3: {fileID: 787082249964141168}
   shell4: {fileID: 3839538324517689376}
   electronPrefab: {fileID: 7163168957733614711, guid: d9ef6dd3b1ab63f408ef1d285ee83a5a, type: 3}
-  shell1Radius: 0.3
-  shell2Radius: 0.5
-  shell3Radius: 0.7
-  shell4Radius: 0.9
-  orbitSpeed1: 90
-  orbitSpeed2: 60
-  orbitSpeed3: 40
-  orbitSpeed4: 25
+  nucleusScale: 1
+  nucleusColor: {r: 1, g: 0.4980392, b: 0.3137255, a: 1}
+  shell1Radius: 0.9
+  shell2Radius: 1.3
+  shell3Radius: 1.8
+  shell4Radius: 2.1
+  orbitSpeed1: 22
+  orbitSpeed2: 16
+  orbitSpeed3: 11
+  orbitSpeed4: 7
+  electronScale: 0.2
+  electronColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+  electronEmission: 2
+  ringColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  ringWidth: 0.002
 --- !u!1 &2934429960701241069
 GameObject:
   m_ObjectHideFlags: 0

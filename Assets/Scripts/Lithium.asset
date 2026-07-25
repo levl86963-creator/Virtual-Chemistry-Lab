@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab8cea24147a27f42927f1e920b1f278, type: 3}
   m_Name: Lithium
   m_EditorClassIdentifier: Assembly-CSharp::ElementData
-  elementName: 
-  symbol: 
-  atomicNumber: 0
-  protons: 0
-  neutrons: 0
-  electrons: 0
-  displayColor: {r: 0, g: 0, b: 0, a: 0}
-  funFact: 
+  elementName: Lithium
+  symbol: Li
+  atomicNumber: 3
+  protons: 3
+  neutrons: 4
+  electrons: 3
+  elementGroup: 0
+  displayColor: {r: 0.95686275, g: 0.24705882, b: 0.36862745, a: 1}
+  isImplemented: 1
+  funFact: Lithium is the lightest metal and can float on water
   atomModelPrefab: {fileID: 0}
