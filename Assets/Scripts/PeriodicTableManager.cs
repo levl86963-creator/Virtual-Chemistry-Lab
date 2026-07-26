@@ -33,6 +33,16 @@ public class PeriodicTableManager : MonoBehaviour
     {
         EnsureInfoSlabReference();
         ClearSelection();
+        StartCoroutine(ShowInitialSlabPromptRoutine());
+    }
+
+    private System.Collections.IEnumerator ShowInitialSlabPromptRoutine()
+    {
+        yield return new WaitForSeconds(2.5f);
+        if (currentSelectedData == null && infoSlab != null)
+        {
+            infoSlab.ShowInitialPrompt();
+        }
     }
 
     private void EnsureInfoSlabReference()
