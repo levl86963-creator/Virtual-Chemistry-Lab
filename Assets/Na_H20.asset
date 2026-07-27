@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ReactionRecipe
   reactantA: Na
   reactantB: H2O
-  productDescription: NaOH + H2
+  productDescription: "2Na + 2H\u2082O \u2192 2NaOH + H\u2082\u2191\n\nSodium reacts
+    violently with water, producing Sodium Hydroxide (NaOH) and Hydrogen gas (H\u2082).
+    The hydrogen gas ignites from the heat of the reaction \u2014 this is why sodium
+    skitters and fizzes on water before catching fire!"
   isHazardousInRealLife: 1
   gasBubbleEffectPrefab: {fileID: 498156312268872391, guid: 9a35b16cf04a7304c82c05aa923d02c6, type: 3}
-  sparkEffectPrefab: {fileID: 0}
-  reactionSound: {fileID: 0}
-  resultingColorTint: {r: 1, g: 1, b: 1, a: 1}
-  reactionDuration: 3
+  sparkEffectPrefab: {fileID: 498156312268872391, guid: 6844fcfd2f9a8e742afc42c72b8047a3, type: 3}
+  reactionSound: {fileID: 8300000, guid: 7a43221a155fda347a45ca7248e90809, type: 3}
+  resultingColorTint: {r: 0.7, g: 0.95, b: 0.85, a: 0.6}
+  reactionDuration: 3.5
   consumesReactant: 1

@@ -32,24 +32,21 @@ public class PeriodicTableManager : MonoBehaviour
     void Start()
     {
         EnsureInfoSlabReference();
-        ClearSelection();
-        StartCoroutine(ShowInitialSlabPromptRoutine());
+        ResetStateOnly();
     }
 
-    private System.Collections.IEnumerator ShowInitialSlabPromptRoutine()
-    {
-        yield return new WaitForSeconds(2.5f);
-        if (currentSelectedData == null && infoSlab != null)
-        {
-            infoSlab.ShowInitialPrompt();
-        }
-    }
-
-    private void EnsureInfoSlabReference()
+private void EnsureInfoSlabReference()
     {
         if (infoSlab == null)
         {
             infoSlab = FindAnyObjectByType<InfoSlabFollower>(FindObjectsInactive.Include);
+        }
+
+        // If the InfoSlab GameObject is inactive, activate it so Start() runs
+        // and the 2.5s coroutine can begin. The script hides the canvas itself.
+        if (infoSlab != null && !infoSlab.gameObject.activeSelf)
+        {
+            infoSlab.gameObject.SetActive(true);
         }
     }
 
@@ -169,6 +166,38 @@ public class PeriodicTableManager : MonoBehaviour
             currentAtomViewer.BuildAtom(data.atomicNumber);
         else
             Debug.LogWarning("[PeriodicTableManager] atomPrefab is missing AtomViewer script!");
+    }
+
+    // Resets tile/atom/UI state WITHOUT hiding the InfoSlab — used on startup
+    // so InfoSlabFollower's own 2.5s coroutine can run unimpeded.
+    private void ResetStateOnly()
+    {
+        if (currentButtonImage != null)
+            currentButtonImage.color = currentOriginalTileColor;
+
+        currentTile = null;
+        currentButtonImage = null;
+        currentSelectedData = null;
+
+        if (highlightBorder != null)
+            highlightBorder.gameObject.SetActive(false);
+
+        if (currentAtom != null)
+        {
+            SafeDestroy(currentAtom);
+            currentAtom = null;
+        }
+
+        if (atomSpawnPoint != null)
+        {
+            for (int i = atomSpawnPoint.childCount - 1; i >= 0; i--)
+                SafeDestroy(atomSpawnPoint.GetChild(i).gameObject);
+        }
+
+        if (elementNameText != null) elementNameText.text = "";
+        if (symbolText != null) symbolText.text = "";
+        if (atomicNumberText != null) atomicNumberText.text = "";
+        if (funFactText != null) funFactText.text = "";
     }
 
     public void ClearSelection()

@@ -4961,6 +4961,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9028627854349766800, guid: 24c728c68968f6447b856666f27564a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 540367839}
+    - targetCorrespondingSourceObject: {fileID: 9028627854349766800, guid: 24c728c68968f6447b856666f27564a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 540367845}
   m_SourcePrefab: {fileID: 100100000, guid: 24c728c68968f6447b856666f27564a5, type: 3}
 --- !u!1001 &304442887
 PrefabInstance:
@@ -7265,6 +7268,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.1, y: 0.1, z: 0.1}
   m_Center: {x: 0, y: 0.05, z: 0}
+--- !u!114 &511123383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511123372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41d88c28d3f6d704e827f3671c7fd0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReactionEffects
+  flashLight: {fileID: 0}
+  flashPeakIntensity: 8
+  flashColor: {r: 1, g: 0.85, b: 0.4, a: 1}
+  flashDuration: 0.25
+  shakeDuration: 0.45
+  shakeMagnitude: 0.012
+  shakeFrequency: 28
+  boomClip: {fileID: 8300000, guid: 1c0205a7387204b48aefcee4cea2c099, type: 3}
+  boomVolume: 0.7
 --- !u!1001 &511799719
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7944,6 +7968,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.1, y: 0.1, z: 0.1}
   m_Center: {x: 0, y: 0.05, z: 0}
+--- !u!114 &540367845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540367838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41d88c28d3f6d704e827f3671c7fd0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReactionEffects
+  flashLight: {fileID: 0}
+  flashPeakIntensity: 8
+  flashColor: {r: 1, g: 0.85, b: 0.4, a: 1}
+  flashDuration: 0.25
+  shakeDuration: 0.45
+  shakeMagnitude: 0.012
+  shakeFrequency: 28
+  boomClip: {fileID: 8300000, guid: 1c0205a7387204b48aefcee4cea2c099, type: 3}
+  boomVolume: 0.7
 --- !u!1001 &541390196
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10063,6 +10108,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9028627854349766800, guid: 24c728c68968f6447b856666f27564a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 511123377}
+    - targetCorrespondingSourceObject: {fileID: 9028627854349766800, guid: 24c728c68968f6447b856666f27564a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 511123383}
   m_SourcePrefab: {fileID: 100100000, guid: 24c728c68968f6447b856666f27564a5, type: 3}
 --- !u!1001 &694970128
 PrefabInstance:
