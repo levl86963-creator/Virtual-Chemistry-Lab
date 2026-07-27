@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af2530d142e78e244a74a40b38eca5f8, type: 3}
+  m_Name: Sodium_Quiz
+  m_EditorClassIdentifier: Assembly-CSharp::QuizData
+  element: {fileID: 11400000, guid: 01356077ffdbf6c49a7c47b3fdb32f6b, type: 2}
+  questions:
+  - questionText: What is Sodium's atomic number?
+    choices:
+    - 11
+    - 12
+    - 9
+    - 8
+    correctAnswerIndex: 0

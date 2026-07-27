@@ -21,7 +21,9 @@ public class PeriodicTableManager : MonoBehaviour
 
     [Header("Floating Info Slab")]
     public InfoSlabFollower infoSlab;
-
+    //add
+    [Header("Quiz System")]
+    public QuizManager quizManager;
     private GameObject currentAtom;
     private AtomViewer currentAtomViewer;
     private GameObject currentTile;
@@ -82,6 +84,11 @@ public class PeriodicTableManager : MonoBehaviour
 
         // Spawn 3D atom
         SpawnAtom(data);
+        // Show "Enter Quiz" button for this element
+    if (quizManager != null)
+    {
+    quizManager.PrepareQuizForElement(data);
+    }
     }
 
     private void UpdateInfoPanel(ElementData data)
