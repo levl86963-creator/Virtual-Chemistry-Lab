@@ -36,13 +36,21 @@ public class InfoSlabFollower : MonoBehaviour
 
     private Coroutine initialDelayCoroutine;
     private bool hasSelectedElement = false;
-    private bool isVisible = false;
 
     void Start()
     {
-        EnsurePlayerCamera();
-        EnsureValidScale();
-        SetVisible(false);
+        Debug.Log("[INFO SLAB] Start() on: " + gameObject.name);
+
+        // Make sure we have a canvas - search up and down
+        Canvas c = GetCanvas();
+        if (c == null)
+        {
+            Debug.LogError("[INFO SLAB] NO CANVAS FOUND on " + gameObject.name + " or parents/children!");
+            return;
+        }
+
+        Debug.Log("[INFO SLAB] Canvas found: " + c.name);
+        c.enabled = false;
 
         if (!hasSelectedElement)
         {
@@ -50,26 +58,104 @@ public class InfoSlabFollower : MonoBehaviour
         }
     }
 
-    void OnEnable()
+    private Canvas GetCanvas()
     {
-        EnsurePlayerCamera();
-        EnsureValidScale();
-        if (isVisible) SnapToTargetPosition();
+        // Try self first
+        Canvas c = GetComponent<Canvas>();
+        if (c != null) return c;
+
+        // Try parent
+        c = GetComponentInParent<Canvas>();
+        if (c != null) return c;
+
+        // Try children
+        c = GetComponentInChildren<Canvas>();
+        if (c != null) return c;
+
+        // Last resort: any canvas in scene
+        return FindAnyObjectByType<Canvas>();
+    }
+
+    private IEnumerator ShowInitialPromptRoutine()
+    {
+        Debug.Log("[INFO SLAB] Coroutine waiting " + initialAppearanceDelay + "s...");
+        yield return new WaitForSeconds(initialAppearanceDelay);
+        Debug.Log("[INFO SLAB] Coroutine done waiting.");
+
+        if (!hasSelectedElement)
+        {
+            ShowInitialPrompt();
+        }
+    }
+
+    public void ShowInitialPrompt()
+    {
+        Debug.Log("[INFO SLAB] ShowInitialPrompt()");
+
+        if (elementNameText != null) elementNameText.text = defaultElementName;
+        else Debug.LogWarning("[INFO SLAB] elementNameText is null");
+
+        if (symbolText != null) symbolText.text = defaultSymbol;
+        if (atomicNumberText != null) atomicNumberText.text = defaultAtomicNumber;
+        if (funFactText != null) funFactText.text = defaultFunFact;
+
+        ShowCanvas();
+        SnapToTargetPosition();
+    }
+
+    public void ShowElement(ElementData data)
+    {
+        if (data == null) return;
+
+        hasSelectedElement = true;
+
+        if (initialDelayCoroutine != null)
+        {
+            StopCoroutine(initialDelayCoroutine);
+            initialDelayCoroutine = null;
+        }
+
+        if (elementNameText != null) elementNameText.text = data.elementName;
+        if (symbolText != null) symbolText.text = data.symbol;
+        if (atomicNumberText != null) atomicNumberText.text = $"Atomic Number: {data.atomicNumber}";
+        if (funFactText != null) funFactText.text = data.funFact;
+
+        ShowCanvas();
+        SnapToTargetPosition();
+    }
+
+    private void ShowCanvas()
+    {
+        Canvas c = GetCanvas();
+        if (c != null)
+        {
+            c.enabled = true;
+            Debug.Log("[INFO SLAB] Canvas ENABLED on: " + c.name);
+        }
+        else Debug.LogError("[INFO SLAB] FAILED - no canvas found!");
+    }
+
+    public void Hide()
+    {
+        Canvas c = GetCanvas();
+        if (c != null) c.enabled = false;
+    }
+
+    public void ResetSelection()
+    {
+        hasSelectedElement = false;
+        Hide();
     }
 
     void LateUpdate()
     {
-        if (!isVisible) return;
+        Canvas c = GetCanvas();
+        if (c == null || !c.enabled) return;
+
         EnsurePlayerCamera();
         if (playerCamera == null) return;
 
         UpdatePositionAndRotation(instantSnap: false);
-    }
-
-    private void EnsureValidScale()
-    {
-        if (transform.localScale.sqrMagnitude < 0.0000001f)
-            transform.localScale = defaultScale;
     }
 
     private void EnsurePlayerCamera()
@@ -97,73 +183,21 @@ public class InfoSlabFollower : MonoBehaviour
         if (fallback != null) playerCamera = fallback.transform;
     }
 
-    private IEnumerator ShowInitialPromptRoutine()
-    {
-        yield return new WaitForSeconds(initialAppearanceDelay);
-
-        if (!hasSelectedElement)
-        {
-            ShowInitialPrompt();
-        }
-    }
-
-    public void ShowInitialPrompt()
-    {
-        if (elementNameText != null) elementNameText.text = defaultElementName;
-        if (symbolText != null) symbolText.text = defaultSymbol;
-        if (atomicNumberText != null) atomicNumberText.text = defaultAtomicNumber;
-        if (funFactText != null) funFactText.text = defaultFunFact;
-
-        SetVisible(true);
-        SnapToTargetPosition();
-    }
-
-    public void ShowElement(ElementData data)
-    {
-        if (data == null) return;
-
-        hasSelectedElement = true;
-        EnsureValidScale();
-
-        if (initialDelayCoroutine != null)
-        {
-            StopCoroutine(initialDelayCoroutine);
-            initialDelayCoroutine = null;
-        }
-
-        if (elementNameText != null) elementNameText.text = data.elementName;
-        if (symbolText != null) symbolText.text = data.symbol;
-        if (atomicNumberText != null) atomicNumberText.text = $"Atomic Number: {data.atomicNumber}";
-        if (funFactText != null) funFactText.text = data.funFact;
-
-        SetVisible(true);
-        SnapToTargetPosition();
-    }
-
-    public void Hide()
-    {
-        SetVisible(false);
-    }
-
-    public void ResetSelection()
-    {
-        hasSelectedElement = false;
-        Hide();
-    }
-
-    private void SetVisible(bool visible)
-    {
-        isVisible = visible;
-        gameObject.SetActive(visible);
-    }
-
     public void SnapToTargetPosition()
     {
         EnsurePlayerCamera();
-        EnsureValidScale();
-        if (playerCamera == null) return;
+        if (playerCamera == null)
+        {
+            Debug.LogError("[INFO SLAB] No camera to snap to!");
+            return;
+        }
+
+        // Force scale
+        if (transform.localScale.sqrMagnitude < 0.0000001f)
+            transform.localScale = defaultScale;
 
         UpdatePositionAndRotation(instantSnap: true);
+        Debug.Log("[INFO SLAB] Snapped to: " + transform.position);
     }
 
     private void UpdatePositionAndRotation(bool instantSnap)

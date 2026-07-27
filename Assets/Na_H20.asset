@@ -16,7 +16,7 @@ MonoBehaviour:
   reactantB: H2O
   productDescription: NaOH + H2
   isHazardousInRealLife: 1
-  gasBubbleEffectPrefab: {fileID: 0}
+  gasBubbleEffectPrefab: {fileID: 498156312268872391, guid: 9a35b16cf04a7304c82c05aa923d02c6, type: 3}
   sparkEffectPrefab: {fileID: 0}
   reactionSound: {fileID: 0}
   resultingColorTint: {r: 1, g: 1, b: 1, a: 1}
