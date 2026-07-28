@@ -19,7 +19,12 @@ public class PeriodicTableManager : MonoBehaviour
     public Transform atomSpawnPoint;
     public GameObject atomPrefab;
 
-    [Header("Floating Info Slab")]
+    [Header("Sounds")]
+    public AudioClip elementSelectSound;
+    public AudioClip elementDeselectSound;
+
+    
+[Header("Floating Info Slab")]
     public InfoSlabFollower infoSlab;
 
     private GameObject currentAtom;
@@ -32,65 +37,56 @@ public class PeriodicTableManager : MonoBehaviour
     void Start()
     {
         EnsureInfoSlabReference();
-        ClearSelection();
-        StartCoroutine(ShowInitialSlabPromptRoutine());
+        ResetStateOnly();
     }
 
-    private System.Collections.IEnumerator ShowInitialSlabPromptRoutine()
-    {
-        yield return new WaitForSeconds(2.5f);
-        if (currentSelectedData == null && infoSlab != null)
-        {
-            infoSlab.ShowInitialPrompt();
-        }
-    }
-
-    private void EnsureInfoSlabReference()
+private void EnsureInfoSlabReference()
     {
         if (infoSlab == null)
         {
             infoSlab = FindAnyObjectByType<InfoSlabFollower>(FindObjectsInactive.Include);
         }
+
+        // If the InfoSlab GameObject is inactive, activate it so Start() runs
+        // and the 2.5s coroutine can begin. The script hides the canvas itself.
+        if (infoSlab != null && !infoSlab.gameObject.activeSelf)
+        {
+            infoSlab.gameObject.SetActive(true);
+        }
     }
 
-    public void SelectElement(ElementData data, GameObject clickedTile = null)
+public void SelectElement(ElementData data, GameObject clickedTile = null)
     {
         if (data == null) return;
 
         EnsureInfoSlabReference();
 
-        // TOGGLE DESELECT: If clicking the currently selected element again -> DESELECT!
+        // TOGGLE DESELECT
         if (currentSelectedData != null && currentSelectedData.atomicNumber == data.atomicNumber)
         {
+            PlaySound(elementDeselectSound);
             ClearSelection();
             return;
         }
 
-        // If another tile was previously selected, restore its original color
+        // Restore previous tile color
         if (currentButtonImage != null && currentTile != null && currentTile != clickedTile)
-        {
             currentButtonImage.color = currentOriginalTileColor;
-        }
 
         currentSelectedData = data;
         Debug.Log($"[PeriodicTableManager] Selected: {data.elementName}");
 
-        // Update old info panel
+        // Play element select click sound
+        PlaySound(elementSelectSound);
+
         UpdateInfoPanel(data);
 
-        // Update floating slab
         if (infoSlab != null)
-        {
             infoSlab.ShowElement(data);
-        }
 
-        // Highlight selected tile
         if (clickedTile != null)
-        {
             SetHighlight(clickedTile, data);
-        }
 
-        // Spawn 3D atom
         SpawnAtom(data);
     }
 
@@ -171,6 +167,38 @@ public class PeriodicTableManager : MonoBehaviour
             Debug.LogWarning("[PeriodicTableManager] atomPrefab is missing AtomViewer script!");
     }
 
+    // Resets tile/atom/UI state WITHOUT hiding the InfoSlab — used on startup
+    // so InfoSlabFollower's own 2.5s coroutine can run unimpeded.
+    private void ResetStateOnly()
+    {
+        if (currentButtonImage != null)
+            currentButtonImage.color = currentOriginalTileColor;
+
+        currentTile = null;
+        currentButtonImage = null;
+        currentSelectedData = null;
+
+        if (highlightBorder != null)
+            highlightBorder.gameObject.SetActive(false);
+
+        if (currentAtom != null)
+        {
+            SafeDestroy(currentAtom);
+            currentAtom = null;
+        }
+
+        if (atomSpawnPoint != null)
+        {
+            for (int i = atomSpawnPoint.childCount - 1; i >= 0; i--)
+                SafeDestroy(atomSpawnPoint.GetChild(i).gameObject);
+        }
+
+        if (elementNameText != null) elementNameText.text = "";
+        if (symbolText != null) symbolText.text = "";
+        if (atomicNumberText != null) atomicNumberText.text = "";
+        if (funFactText != null) funFactText.text = "";
+    }
+
     public void ClearSelection()
     {
         // Restore tile image color to original group color (NOT white, NOT gray)
@@ -231,7 +259,18 @@ public class PeriodicTableManager : MonoBehaviour
         }
     }
 
-    private void SafeDestroy(GameObject obj)
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip == null) return;
+        // Use a shared AudioSource on this GameObject for 2D UI sounds
+        AudioSource src = GetComponent<AudioSource>();
+        if (src == null) src = gameObject.AddComponent<AudioSource>();
+        src.spatialBlend = 0f;
+        src.PlayOneShot(clip, 0.65f);
+    }
+
+    
+private void SafeDestroy(GameObject obj)
     {
         if (obj == null) return;
         if (Application.isPlaying)
