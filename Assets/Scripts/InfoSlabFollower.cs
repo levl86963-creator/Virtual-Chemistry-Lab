@@ -26,7 +26,12 @@ public class InfoSlabFollower : MonoBehaviour
     public TextMeshProUGUI atomicNumberText;
     public TextMeshProUGUI funFactText;
 
-    [Header("Initial Delay & Prompt")]
+    [Header("Sounds")]
+    public AudioClip slabAppearSound;
+    [Range(0f,1f)] public float slabSoundVolume = 0.5f;
+
+    
+[Header("Initial Delay & Prompt")]
     public float initialAppearanceDelay = 2.5f;
 
     public string defaultElementName = "Periodic Table";
@@ -87,7 +92,7 @@ void Start()
         }
     }
 
-    public void ShowInitialPrompt()
+public void ShowInitialPrompt()
     {
         Debug.Log("[INFO SLAB] ShowInitialPrompt()");
 
@@ -100,6 +105,7 @@ void Start()
 
         ShowCanvas();
         SnapToTargetPosition();
+        PlaySlabSound();
     }
 
 public void ShowElement(ElementData data)
@@ -136,8 +142,19 @@ public void ShowElement(ElementData data)
 
         ShowCanvas();
         SnapToTargetPosition();
+        PlaySlabSound();
     }
 
+private void PlaySlabSound()
+    {
+        if (slabAppearSound == null) return;
+        AudioSource src = GetComponent<AudioSource>();
+        if (src == null) src = gameObject.AddComponent<AudioSource>();
+        src.spatialBlend = 0f;
+        src.PlayOneShot(slabAppearSound, slabSoundVolume);
+    }
+
+    
 private void ShowCanvas()
     {
         Canvas c = GetOrFindCanvas();

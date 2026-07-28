@@ -19,7 +19,12 @@ public class PeriodicTableManager : MonoBehaviour
     public Transform atomSpawnPoint;
     public GameObject atomPrefab;
 
-    [Header("Floating Info Slab")]
+    [Header("Sounds")]
+    public AudioClip elementSelectSound;
+    public AudioClip elementDeselectSound;
+
+    
+[Header("Floating Info Slab")]
     public InfoSlabFollower infoSlab;
 
     private GameObject currentAtom;
@@ -50,44 +55,38 @@ private void EnsureInfoSlabReference()
         }
     }
 
-    public void SelectElement(ElementData data, GameObject clickedTile = null)
+public void SelectElement(ElementData data, GameObject clickedTile = null)
     {
         if (data == null) return;
 
         EnsureInfoSlabReference();
 
-        // TOGGLE DESELECT: If clicking the currently selected element again -> DESELECT!
+        // TOGGLE DESELECT
         if (currentSelectedData != null && currentSelectedData.atomicNumber == data.atomicNumber)
         {
+            PlaySound(elementDeselectSound);
             ClearSelection();
             return;
         }
 
-        // If another tile was previously selected, restore its original color
+        // Restore previous tile color
         if (currentButtonImage != null && currentTile != null && currentTile != clickedTile)
-        {
             currentButtonImage.color = currentOriginalTileColor;
-        }
 
         currentSelectedData = data;
         Debug.Log($"[PeriodicTableManager] Selected: {data.elementName}");
 
-        // Update old info panel
+        // Play element select click sound
+        PlaySound(elementSelectSound);
+
         UpdateInfoPanel(data);
 
-        // Update floating slab
         if (infoSlab != null)
-        {
             infoSlab.ShowElement(data);
-        }
 
-        // Highlight selected tile
         if (clickedTile != null)
-        {
             SetHighlight(clickedTile, data);
-        }
 
-        // Spawn 3D atom
         SpawnAtom(data);
     }
 
@@ -260,7 +259,18 @@ private void EnsureInfoSlabReference()
         }
     }
 
-    private void SafeDestroy(GameObject obj)
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip == null) return;
+        // Use a shared AudioSource on this GameObject for 2D UI sounds
+        AudioSource src = GetComponent<AudioSource>();
+        if (src == null) src = gameObject.AddComponent<AudioSource>();
+        src.spatialBlend = 0f;
+        src.PlayOneShot(clip, 0.65f);
+    }
+
+    
+private void SafeDestroy(GameObject obj)
     {
         if (obj == null) return;
         if (Application.isPlaying)

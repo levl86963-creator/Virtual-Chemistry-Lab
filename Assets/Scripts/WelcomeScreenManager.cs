@@ -18,7 +18,10 @@ public class WelcomeScreenManager : MonoBehaviour
     public float boardRevealDelay = 0.3f;
 
     [Header("Audio")]
-    public AudioClip startSound;
+    
+    public AudioClip confirmSound;  // For Start Experimenting button
+    
+public AudioClip startSound;
     private AudioSource audioSource;
 
     void Start()
@@ -41,8 +44,11 @@ public class WelcomeScreenManager : MonoBehaviour
     }
 
     // Call this from the Start Button's OnClick
-    public void OnStartButtonClicked()
+public void OnStartButtonClicked()
     {
+        // Play confirm chord immediately on button press
+        if (confirmSound != null)
+            audioSource.PlayOneShot(confirmSound, 0.7f);
         StartCoroutine(StartLabSequence());
     }
 

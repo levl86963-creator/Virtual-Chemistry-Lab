@@ -413,6 +413,7 @@ GameObject:
   m_Component:
   - component: {fileID: 182922202}
   - component: {fileID: 182922201}
+  - component: {fileID: 182922203}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -439,7 +440,8 @@ MonoBehaviour:
   atomSpawnPoint: {fileID: 1102640915}
   fadeOutDuration: 1.5
   boardRevealDelay: 0.3
-  startSound: {fileID: 0}
+  confirmSound: {fileID: 8300000, guid: 74808c8a951bcf849a72339041ebe970, type: 3}
+  startSound: {fileID: 8300000, guid: 74808c8a951bcf849a72339041ebe970, type: 3}
 --- !u!4 &182922202
 Transform:
   m_ObjectHideFlags: 0
@@ -455,6 +457,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &182922203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182922200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0077adb0bf9898245ae1ca7c7cf5b68f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LabSoundManager
+  elementClickSound: {fileID: 8300000, guid: 5ba6bdf5707c4fc428c7037fe5f89d54, type: 3}
+  confirmButtonSound: {fileID: 8300000, guid: 74808c8a951bcf849a72339041ebe970, type: 3}
+  grabPickupSound: {fileID: 8300000, guid: e7ead9abca8a62743b5ea70c028bb700, type: 3}
+  waterSplashSound: {fileID: 8300000, guid: 2c28018bb4e1de94988c6e27d0b88b5c, type: 3}
+  uiVolume: 0.6
+  interactionVolume: 0.75
 --- !u!1 &183022850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,6 +1560,8 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.85, b: 0.2, a: 1}
   atomSpawnPoint: {fileID: 1102640916}
   atomPrefab: {fileID: 1390176233405420348, guid: 8bed93f948892be44875f9e55651ea07, type: 3}
+  elementSelectSound: {fileID: 8300000, guid: 5ba6bdf5707c4fc428c7037fe5f89d54, type: 3}
+  elementDeselectSound: {fileID: 8300000, guid: 5ba6bdf5707c4fc428c7037fe5f89d54, type: 3}
   infoSlab: {fileID: 1895338341}
 --- !u!114 &586145814
 MonoBehaviour:
@@ -3801,6 +3823,8 @@ MonoBehaviour:
   symbolText: {fileID: 443659324}
   atomicNumberText: {fileID: 437709751}
   funFactText: {fileID: 902849993}
+  slabAppearSound: {fileID: 8300000, guid: eb8c8e8f9b80a4749a9ed94fbef7b8c8, type: 3}
+  slabSoundVolume: 0.5
   initialAppearanceDelay: 2.5
   defaultElementName: Periodic Table
   defaultSymbol: '?'
