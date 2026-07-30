@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 18
   electrons: 17
   elementGroup: 6
-  displayColor: {r: 0.101960786, g: 0.7372549, b: 0.6117647, a: 0}
+  displayColor: {r: 0.101960786, g: 0.7372549, b: 0.6117647, a: 1}
   isImplemented: 1
   funFact: "\tUsed to clean swimming pools. Toxic gas."
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

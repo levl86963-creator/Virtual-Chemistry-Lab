@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 8
   electrons: 8
   elementGroup: 5
-  displayColor: {r: 1, g: 0.27058825, b: 0, a: 0}
+  displayColor: {r: 1, g: 0.27058825, b: 0, a: 1}
   isImplemented: 1
   funFact: Makes up 21% of Earth's atmosphere.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

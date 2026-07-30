@@ -13,8 +13,13 @@ public class ElementButton : MonoBehaviour
         button.onClick.AddListener(OnClicked);
     }
 
-    void OnClicked()
+void OnClicked()
     {
-        GameFlowManager.Instance?.OnElementSelected(elementData);
+        if (elementData == null) return;
+        var mgr = FindAnyObjectByType<PeriodicTableManager>();
+        if (mgr != null)
+            mgr.SelectElement(elementData, gameObject);
+        else
+            GameFlowManager.Instance?.OnElementSelected(elementData);
     }
 }

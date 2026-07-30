@@ -73,27 +73,11 @@ public void OnStartButtonClicked()
         // Disable welcome canvas
         welcomeCanvas.SetActive(false);
 
-        // Wait then reveal the board
+        // Wait then reveal the board via GameFlowManager (which owns periodicTableBoard)
         yield return new WaitForSeconds(boardRevealDelay);
 
-        if (periodicTableBoard != null)
-        {
-            periodicTableBoard.SetActive(true);
-
-            // Optional: animate board scale up
-            periodicTableBoard.transform.localScale = Vector3.zero;
-            float scaleT = 0;
-            while (scaleT < 1)
-            {
-                scaleT += Time.deltaTime * 3f;
-                periodicTableBoard.transform.localScale = Vector3.Lerp(
-                    Vector3.zero,
-                    new Vector3(0.005f, 0.005f, 0.005f), // your canvas scale
-                    Mathf.SmoothStep(0, 1, scaleT)
-                );
-                yield return null;
-            }
-        }
+        // Hand off to GameFlowManager to show the periodic table
+        GameFlowManager.Instance?.SetStage(GameFlowManager.Stage.ElementSelect);
 
         if (atomSpawnPoint != null)
             atomSpawnPoint.SetActive(true);

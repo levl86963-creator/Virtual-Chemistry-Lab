@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 20
   electrons: 19
   elementGroup: 0
-  displayColor: {r: 0.5568628, g: 0.26666668, b: 0.6784314, a: 0}
+  displayColor: {r: 0.5568628, g: 0.26666668, b: 0.6784314, a: 1}
   isImplemented: 1
   funFact: Found in bananas. Vital for heart function.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}
