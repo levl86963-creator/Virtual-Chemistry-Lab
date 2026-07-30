@@ -1,128 +1,173 @@
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-// Attach to a QuizPanel GameObject (world-space Canvas, same pattern as your InfoPanel).
-// Clicking "Enter Quiz" now runs through ALL quiz banks in sequence (one
-// question per element), one after another, with a "Continue" button to
-// advance - instead of showing just one random question and stopping.
 public class QuizManager : MonoBehaviour
 {
     [Header("Quiz Data")]
-    [Tooltip("One QuizData asset per element. Drag all 8 in here.")]
+    [Tooltip("Exactly eight QuizData assets, one for each curriculum element.")]
     public QuizData[] quizBanks;
 
     [Header("UI References")]
-    public GameObject quizPanel;              // parent panel, toggled on/off
+    public GameObject quizPanel;
     public TextMeshProUGUI questionText;
-    public Button[] choiceButtons;            // size 4 in the inspector
-    public TextMeshProUGUI[] choiceButtonLabels; // matching labels for choiceButtons
-    public TextMeshProUGUI feedbackText;      // "Correct!" / "Try again"
-    public TextMeshProUGUI scoreText;         // optional running score display
+    public Button[] choiceButtons;
+    public TextMeshProUGUI[] choiceButtonLabels;
+    public TextMeshProUGUI feedbackText;
+    public TextMeshProUGUI scoreText;
 
     [Header("Enter Quiz Button")]
-    [Tooltip("Small button shown next to the InfoPanel. Student clicks it to start the full 8-question quiz.")]
-    public GameObject enterQuizButtonObject;  // the button's GameObject, toggled on/off
+    public GameObject enterQuizButtonObject;
     public Button enterQuizButton;
 
-    [Header("Continue Button")]
-    [Tooltip("Shown after each answer. Clicking it moves to the next element's question, or finishes the quiz on the last one.")]
+    [Header("Question Actions")]
     public GameObject continueButtonObject;
     public Button continueButton;
+    public GameObject quitButtonObject;
+    public Button quitButton;
 
-    [Header("After Quiz Finishes")]
-    [Tooltip("Shown/activated once the student completes all 8 questions - e.g. the Start Experimenting button. It scales up from 0, same style as the Welcome Screen reveal.")]
+    [Header("Results")]
+    public GameObject closeButtonObject;
+    public Button closeButton;
+    public GameObject mainboardObject;
     public GameObject startExperimentingButtonObject;
     public float revealScaleDuration = 0.4f;
 
-    private ElementData pendingElement;       // last element selected on the periodic table (not required anymore, kept for reference)
-    private List<QuizData> quizSequence;      // the full run of 8 quiz banks for this session
-    private int currentQuizIndex;             // which bank in quizSequence we're on
+    private readonly List<QuizQuestion> questionSequence = new();
     private QuizQuestion currentQuestion;
-    private int score = 0;
-    private int questionsAnswered = 0;
-    private bool answerLocked = false;
+    private int currentQuestionIndex;
+    private int score;
+    private int questionsAnswered;
+    private bool answerLocked;
+    private bool showingResults;
 
-    void Start()
+    private static readonly Color PanelButtonColor = Color.white;
+    private static readonly Color CorrectColor = new(0.133f, 0.773f, 0.369f, 1f);
+    private static readonly Color IncorrectColor = new(0.937f, 0.267f, 0.267f, 1f);
+    private static readonly Color AccentColor = new(0.133f, 0.827f, 0.933f, 1f);
+
+    private void Start()
     {
-        if (quizPanel != null) quizPanel.SetActive(false);
+        if (quizPanel != null)
+            quizPanel.SetActive(false);
+
+        if (questionText != null)
+        {
+            questionText.enableAutoSizing = true;
+            questionText.fontSizeMin = 24f;
+            questionText.fontSizeMax = 40f;
+            questionText.maxVisibleLines = 3;
+            questionText.overflowMode = TextOverflowModes.Ellipsis;
+        }
 
         for (int i = 0; i < choiceButtons.Length; i++)
         {
-            int index = i; // capture for closure
-            choiceButtons[i].onClick.AddListener(() => OnAnswerSelected(index));
+            int choiceIndex = i;
+            if (choiceButtons[i] != null)
+                choiceButtons[i].onClick.AddListener(() => OnAnswerSelected(choiceIndex));
         }
 
         if (enterQuizButton != null)
-        {
             enterQuizButton.onClick.AddListener(OnEnterQuizClicked);
-        }
-
-        if (continueButtonObject != null) continueButtonObject.SetActive(false);
         if (continueButton != null)
-        {
             continueButton.onClick.AddListener(OnContinueClicked);
-        }
+        if (quitButton != null)
+            quitButton.onClick.AddListener(OnQuitClicked);
+        if (closeButton != null)
+            closeButton.onClick.AddListener(CloseQuizFinal);
+
+        SetActive(continueButtonObject, false);
+        SetActive(quitButtonObject, false);
+        SetActive(closeButtonObject, false);
+        SetButtonColor(continueButton, AccentColor);
+        SetButtonColor(quitButton, AccentColor);
+        SetButtonColor(closeButton, AccentColor);
     }
 
-    // Call this from PeriodicTableManager.SelectElement() if you still want
-    // to track the last-picked element. No longer required for Enter Quiz to
-    // work, since Enter Quiz now always runs the full 8-element sequence.
     public void PrepareQuizForElement(ElementData element)
     {
-        pendingElement = element;
+        if (enterQuizButtonObject != null)
+            enterQuizButtonObject.SetActive(true);
     }
 
     private void OnEnterQuizClicked()
     {
-        if (quizBanks == null || quizBanks.Length == 0) return;
-
-        // Build a fresh sequence of all 8 banks, shuffled, and reset score.
-        quizSequence = new List<QuizData>(quizBanks);
-        Shuffle(quizSequence);
-
-        currentQuizIndex = 0;
+        questionSequence.Clear();
         score = 0;
         questionsAnswered = 0;
-        if (scoreText != null) scoreText.text = $"Score: 0/0";
+        currentQuestionIndex = 0;
+        showingResults = false;
 
-        ShowQuestionAt(currentQuizIndex);
+        if (quizBanks == null || quizBanks.Length != 8)
+        {
+            Debug.LogError($"[QuizManager] Expected exactly 8 quiz banks, found {quizBanks?.Length ?? 0}.");
+            return;
+        }
+
+        List<QuizData> shuffledBanks = new(quizBanks);
+        Shuffle(shuffledBanks);
+        foreach (QuizData bank in shuffledBanks)
+        {
+            if (bank == null || bank.questions == null || bank.questions.Length != 3)
+            {
+                Debug.LogError($"[QuizManager] Quiz bank '{bank?.name ?? "null"}' must contain exactly 3 questions.");
+                return;
+            }
+
+            List<QuizQuestion> bankQuestions = new(bank.questions);
+            foreach (QuizQuestion question in bankQuestions)
+            {
+                if (question == null || question.choices == null || question.choices.Length != 4 ||
+                    question.correctAnswerIndex < 0 || question.correctAnswerIndex >= question.choices.Length)
+                {
+                    Debug.LogError($"[QuizManager] Quiz bank '{bank.name}' contains a question with exactly four choices and a valid correct-answer index required.");
+                    return;
+                }
+            }
+
+            Shuffle(bankQuestions);
+            questionSequence.AddRange(bankQuestions);
+        }
+
+        Shuffle(questionSequence);
+        if (mainboardObject != null)
+            mainboardObject.SetActive(false);
+        ShowQuestionAt(0);
     }
 
     private void ShowQuestionAt(int index)
     {
-        if (quizSequence == null || index < 0 || index >= quizSequence.Count)
+        if (index >= questionSequence.Count)
         {
-            FinishQuiz();
+            ShowResults(true);
             return;
         }
 
-        QuizData bank = quizSequence[index];
-        if (bank == null || bank.questions == null || bank.questions.Length == 0)
-        {
-            Debug.LogWarning($"No quiz questions found for {bank?.element?.elementName}. Skipping.");
-            currentQuizIndex++;
-            ShowQuestionAt(currentQuizIndex);
-            return;
-        }
-
-        currentQuestion = bank.questions[Random.Range(0, bank.questions.Length)];
+        currentQuestionIndex = index;
+        currentQuestion = questionSequence[index];
         answerLocked = false;
+        showingResults = false;
 
         questionText.text = currentQuestion.questionText;
-        feedbackText.text = "";
-        if (continueButtonObject != null) continueButtonObject.SetActive(false);
+        feedbackText.text = string.Empty;
+        feedbackText.color = Color.white;
+        scoreText.text = $"Score: {score}/{questionsAnswered}    Question {index + 1}/{questionSequence.Count}";
+        SetActive(continueButtonObject, false);
+        SetActive(quitButtonObject, true);
+        SetActive(closeButtonObject, false);
 
-        for (int i = 0; i < choiceButtonLabels.Length; i++)
+        for (int i = 0; i < choiceButtons.Length; i++)
         {
             bool hasChoice = i < currentQuestion.choices.Length;
-            choiceButtons[i].gameObject.SetActive(hasChoice);
-            if (hasChoice)
-            {
-                choiceButtonLabels[i].text = currentQuestion.choices[i];
-                SetButtonColor(choiceButtons[i], Color.white);
-            }
+            SetActive(choiceButtons[i]?.gameObject, hasChoice);
+            if (!hasChoice)
+                continue;
+
+            choiceButtonLabels[i].text = currentQuestion.choices[i];
+            choiceButtons[i].interactable = true;
+            SetButtonColor(choiceButtons[i], PanelButtonColor);
         }
 
         quizPanel.SetActive(true);
@@ -130,127 +175,143 @@ public class QuizManager : MonoBehaviour
 
     private void OnAnswerSelected(int choiceIndex)
     {
-        if (answerLocked || currentQuestion == null) return;
+        if (answerLocked || currentQuestion.choices == null || choiceIndex < 0 || choiceIndex >= currentQuestion.choices.Length)
+            return;
+
         answerLocked = true;
         questionsAnswered++;
-
         bool isCorrect = choiceIndex == currentQuestion.correctAnswerIndex;
-
-        // Highlight selected + correct answer
-        SetButtonColor(choiceButtons[choiceIndex], isCorrect ? Color.green : Color.red);
-        if (!isCorrect)
-        {
-            SetButtonColor(choiceButtons[currentQuestion.correctAnswerIndex], Color.green);
-        }
-
         if (isCorrect)
         {
             score++;
             feedbackText.text = "Correct!";
-            feedbackText.color = Color.green;
+            feedbackText.color = CorrectColor;
+            SetButtonColor(choiceButtons[choiceIndex], CorrectColor);
         }
         else
         {
-            feedbackText.text = "Not quite - check the highlighted answer.";
-            feedbackText.color = Color.red;
+            feedbackText.text = "Not quite - the correct answer is highlighted.";
+            feedbackText.color = IncorrectColor;
+            SetButtonColor(choiceButtons[choiceIndex], IncorrectColor);
+            if (currentQuestion.correctAnswerIndex >= 0 && currentQuestion.correctAnswerIndex < choiceButtons.Length)
+                SetButtonColor(choiceButtons[currentQuestion.correctAnswerIndex], CorrectColor);
         }
 
-        if (scoreText != null)
-        {
-            scoreText.text = $"Score: {score}/{questionsAnswered}";
-        }
+        foreach (Button button in choiceButtons)
+            if (button != null)
+                button.interactable = false;
 
-        // Show Continue so the student moves to the next element's question
-        // (or finishes, if this was the last one) whenever they're ready.
-        if (continueButtonObject != null) continueButtonObject.SetActive(true);
+        scoreText.text = $"Score: {score}/{questionsAnswered}    Question {currentQuestionIndex + 1}/{questionSequence.Count}";
+        SetActive(continueButtonObject, true);
+        SetActive(quitButtonObject, true);
     }
 
     private void OnContinueClicked()
     {
-        currentQuizIndex++;
-        if (quizSequence != null && currentQuizIndex < quizSequence.Count)
-        {
-            ShowQuestionAt(currentQuizIndex);
-        }
+        Debug.Log("Continue clicked");
+
+        if (!answerLocked || showingResults)
+            return;
+
+        int nextIndex = currentQuestionIndex + 1;
+        if (nextIndex < questionSequence.Count)
+            ShowQuestionAt(nextIndex);
         else
-        {
-            FinishQuiz();
-        }
+            ShowResults(true);
     }
 
-    private void FinishQuiz()
+    private void OnQuitClicked()
     {
-        questionText.text = "Quiz complete!";
+        if (!showingResults)
+            ShowResults(false);
+    }
+
+    private void ShowResults(bool completed)
+    {
+        showingResults = true;
+        answerLocked = true;
+        questionText.text = completed ? "Quiz Complete!" : "Quiz Ended";
         feedbackText.text = $"Final score: {score}/{questionsAnswered}";
         feedbackText.color = Color.white;
+        scoreText.text = "All answered questions are included in your score.";
 
-        foreach (var btn in choiceButtons)
+        foreach (Button button in choiceButtons)
         {
-            btn.gameObject.SetActive(false);
+            if (button == null)
+                continue;
+            button.gameObject.SetActive(false);
+            button.interactable = false;
         }
 
-        if (continueButtonObject != null) continueButtonObject.SetActive(true);
-        // Re-wire Continue's last click to close the panel instead of advancing.
-        continueButton.onClick.RemoveListener(OnContinueClicked);
-        continueButton.onClick.AddListener(CloseQuizFinal);
+        SetActive(continueButtonObject, false);
+        SetActive(quitButtonObject, false);
+        SetActive(closeButtonObject, true);
+        quizPanel.SetActive(true);
     }
 
     private void CloseQuizFinal()
     {
-        CloseQuiz();
-        // Restore normal Continue behavior for the next quiz run.
-        continueButton.onClick.RemoveListener(CloseQuizFinal);
-        continueButton.onClick.AddListener(OnContinueClicked);
+        if (quizPanel != null)
+            quizPanel.SetActive(false);
+        SetActive(closeButtonObject, false);
+        SetActive(continueButtonObject, false);
+        SetActive(quitButtonObject, false);
 
-        // Reveal Start Experimenting now that the quiz is done, with a
-        // scale-up pop-in (same style as the Welcome Screen reveal).
-        if (startExperimentingButtonObject != null)
+        foreach (Button button in choiceButtons)
         {
-            StartCoroutine(ScaleUpReveal(startExperimentingButtonObject));
+            if (button == null)
+                continue;
+            button.gameObject.SetActive(true);
+            button.interactable = true;
         }
+
+        if (mainboardObject != null)
+            StartCoroutine(ScaleUpReveal(mainboardObject));
+        else if (startExperimentingButtonObject != null)
+            StartCoroutine(ScaleUpReveal(startExperimentingButtonObject));
     }
 
-    private System.Collections.IEnumerator ScaleUpReveal(GameObject target)
+    private IEnumerator ScaleUpReveal(GameObject target)
     {
         target.SetActive(true);
+        Vector3 finalScale = target.transform.localScale;
         target.transform.localScale = Vector3.zero;
-
-        float t = 0f;
-        while (t < revealScaleDuration)
+        float elapsed = 0f;
+        while (elapsed < revealScaleDuration)
         {
-            t += Time.deltaTime;
-            float scale = Mathf.SmoothStep(0f, 1f, t / revealScaleDuration);
-            target.transform.localScale = new Vector3(scale, scale, scale);
+            elapsed += Time.deltaTime;
+            float normalizedTime = Mathf.Clamp01(elapsed / revealScaleDuration);
+            float scale = Mathf.SmoothStep(0f, 1f, normalizedTime);
+            target.transform.localScale = finalScale * scale;
             yield return null;
         }
-
-        target.transform.localScale = Vector3.one;
+        target.transform.localScale = finalScale;
     }
 
-    private void CloseQuiz()
+    private static void SetActive(GameObject target, bool active)
     {
-        if (quizPanel != null) quizPanel.SetActive(false);
-        if (continueButtonObject != null) continueButtonObject.SetActive(false);
-        foreach (var btn in choiceButtons)
-        {
-            btn.gameObject.SetActive(true);
-        }
+        if (target != null)
+            target.SetActive(active);
     }
 
-    private void SetButtonColor(Button button, Color color)
+    private static void SetButtonColor(Button button, Color color)
     {
-        var colors = button.colors;
+        if (button == null)
+            return;
+        ColorBlock colors = button.colors;
         colors.normalColor = color;
+        colors.highlightedColor = color;
         colors.selectedColor = color;
+        colors.disabledColor = color;
         button.colors = colors;
     }
 
-    private void Shuffle(List<QuizData> list)
+    private static void Shuffle<T>(IList<T> list)
     {
         for (int i = list.Count - 1; i > 0; i--)
         {
-            int j = Random.Range(0, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
+            int swapIndex = Random.Range(0, i + 1);
+            (list[i], list[swapIndex]) = (list[swapIndex], list[i]);
         }
     }
 }

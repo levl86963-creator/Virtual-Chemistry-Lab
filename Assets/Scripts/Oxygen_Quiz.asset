@@ -14,10 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuizData
   element: {fileID: 11400000, guid: 7ae9e7e9931ea284ea94ec3b27779d78, type: 2}
   questions:
-  - questionText: What is the atomic number of Oxygen?
+  - questionText: What is the atomic number of oxygen?
     choices:
     - 6
     - 7
     - 8
     - 9
     correctAnswerIndex: 2
+  - questionText: What percentage of Earth's atmosphere is oxygen, approximately?
+    choices:
+    - 10%
+    - 21%
+    - ' fifty percent'
+    - 78%
+    correctAnswerIndex: 1
+  - questionText: What is the chemical symbol for oxygen?
+    choices:
+    - Ox
+    - O
+    - Og
+    - On
+    correctAnswerIndex: 1

@@ -21,3 +21,17 @@ MonoBehaviour:
     - Plasma
     - Gas
     correctAnswerIndex: 3
+  - questionText: What is the chemical symbol for chlorine?
+    choices:
+    - C
+    - Cl
+    - Ch
+    - Cr
+    correctAnswerIndex: 1
+  - questionText: What is the atomic number of chlorine?
+    choices:
+    - 15
+    - 16
+    - 17
+    - 18
+    correctAnswerIndex: 2

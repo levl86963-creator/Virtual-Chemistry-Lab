@@ -21,3 +21,17 @@ MonoBehaviour:
     - MgSO4
     - 2MgO
     correctAnswerIndex: 1
+  - questionText: What is the chemical symbol for magnesium?
+    choices:
+    - Mn
+    - Mg
+    - Ma
+    - Ms
+    correctAnswerIndex: 1
+  - questionText: What is the atomic number of magnesium?
+    choices:
+    - 10
+    - 12
+    - 14
+    - 24
+    correctAnswerIndex: 1

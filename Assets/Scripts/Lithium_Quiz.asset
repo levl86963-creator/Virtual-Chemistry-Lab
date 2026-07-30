@@ -17,7 +17,21 @@ MonoBehaviour:
   - questionText: Lithium belongs to which group?
     choices:
     - Halogens
-    - Alkali Metals
-    - Noble Gases
+    - Alkali metals
+    - Noble gases
     - Chalcogens
+    correctAnswerIndex: 1
+  - questionText: What is the chemical symbol for lithium?
+    choices:
+    - Li
+    - L
+    - Lt
+    - Lm
+    correctAnswerIndex: 0
+  - questionText: What is the atomic number of lithium?
+    choices:
+    - 2
+    - 3
+    - 6
+    - 7
     correctAnswerIndex: 1

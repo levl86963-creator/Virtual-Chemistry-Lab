@@ -21,3 +21,17 @@ MonoBehaviour:
     - 9
     - 8
     correctAnswerIndex: 0
+  - questionText: What is the chemical symbol for sodium?
+    choices:
+    - So
+    - Sd
+    - Na
+    - Sm
+    correctAnswerIndex: 2
+  - questionText: Sodium belongs to which element group?
+    choices:
+    - Alkali metals
+    - Halogens
+    - Noble gases
+    - Transition metals
+    correctAnswerIndex: 0

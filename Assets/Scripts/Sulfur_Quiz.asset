@@ -21,3 +21,17 @@ MonoBehaviour:
     - A gas
     - A metal
     correctAnswerIndex: 2
+  - questionText: What is the chemical symbol for sulfur?
+    choices:
+    - Su
+    - S
+    - Sf
+    - Sr
+    correctAnswerIndex: 1
+  - questionText: What is the atomic number of sulfur?
+    choices:
+    - 8
+    - 14
+    - 16
+    - 32
+    correctAnswerIndex: 2

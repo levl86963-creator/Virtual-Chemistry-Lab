@@ -18,4 +18,20 @@ MonoBehaviour:
     choices:
     - True
     - False
+    - Only when heated
+    - Only with oxygen
     correctAnswerIndex: 0
+  - questionText: What is the chemical symbol for calcium?
+    choices:
+    - C
+    - Ca
+    - Cl
+    - Cm
+    correctAnswerIndex: 1
+  - questionText: What is the atomic number of calcium?
+    choices:
+    - 18
+    - 19
+    - 20
+    - 21
+    correctAnswerIndex: 2
