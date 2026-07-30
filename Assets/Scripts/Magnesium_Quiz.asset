@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af2530d142e78e244a74a40b38eca5f8, type: 3}
+  m_Name: Magnesium_Quiz
+  m_EditorClassIdentifier: Assembly-CSharp::QuizData
+  element: {fileID: 11400000, guid: 8892c8dfc6662a143ab408c9ad70089f, type: 2}
+  questions:
+  - questionText: What is produced when magnesium burns in oxygen?
+    choices:
+    - MgCl2
+    - MgO
+    - MgSO4
+    - 2MgO
+    correctAnswerIndex: 1
+  - questionText: What is the chemical symbol for magnesium?
+    choices:
+    - Mn
+    - Mg
+    - Ma
+    - Ms
+    correctAnswerIndex: 1
+  - questionText: What is the atomic number of magnesium?
+    choices:
+    - 10
+    - 12
+    - 14
+    - 24
+    correctAnswerIndex: 1
