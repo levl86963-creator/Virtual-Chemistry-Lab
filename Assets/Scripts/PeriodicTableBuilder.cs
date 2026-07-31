@@ -17,8 +17,12 @@ public class PeriodicTableBuilder : MonoBehaviour
     public Color lockedColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
     public float activeGlowAlpha = 1f;
 
-    void Start() => BuildTable();
 
+    void Start()
+{
+    Debug.Log("BUILD TABLE STARTING");
+    BuildTable();
+}
     public void BuildTable()
     {
         foreach (Transform child in gridParent)

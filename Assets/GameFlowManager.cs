@@ -3,6 +3,7 @@ using UnityEngine;
 public class GameFlowManager : MonoBehaviour
 {
     public static GameFlowManager Instance;
+    
     public enum Stage { Welcome, ElementSelect, ReactionExperiment, Result }
     public Stage currentStage = Stage.Welcome;
 
@@ -12,11 +13,20 @@ public class GameFlowManager : MonoBehaviour
     public GameObject workbenchArea;
     public GameObject continueButton;
     public GameObject infoSlab;
+    public GameObject backButton;
 
     [Header("Data")]
     public ElementData selectedElementA;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     void Start() => SetStage(Stage.Welcome);
 
@@ -26,11 +36,13 @@ public class GameFlowManager : MonoBehaviour
         welcomeCanvas?.SetActive(newStage == Stage.Welcome);
         periodicTableBoard?.SetActive(newStage == Stage.ElementSelect);
         workbenchArea?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
-        if (continueButton != null) continueButton.SetActive(false);
+        continueButton?.SetActive(false);
+        backButton?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
         
         if (newStage == Stage.ElementSelect)
         {
-            selectedElementA = null;
+            if (currentStage == Stage.Welcome) 
+                selectedElementA = null;
             infoSlab?.GetComponent<InfoSlabFollower>()?.ResetSelection();
         }
         if (newStage == Stage.ReactionExperiment)
