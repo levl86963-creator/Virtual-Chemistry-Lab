@@ -88,6 +88,9 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
             SetHighlight(clickedTile, data);
 
         SpawnAtom(data);
+
+        // Notify GameFlowManager so it stores the selection and shows ContinueButton
+        GameFlowManager.Instance?.OnElementSelected(data);
     }
 
     private void UpdateInfoPanel(ElementData data)
@@ -241,6 +244,13 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
         if (infoSlab != null)
         {
             infoSlab.Hide();
+        }
+
+        // Reset GameFlowManager selection (hides ContinueButton)
+        if (GameFlowManager.Instance != null)
+        {
+            GameFlowManager.Instance.selectedElementA = null;
+            GameFlowManager.Instance.continueButton?.SetActive(false);
         }
     }
 

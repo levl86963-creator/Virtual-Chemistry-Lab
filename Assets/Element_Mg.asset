@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 12
   electrons: 12
   elementGroup: 1
-  displayColor: {r: 0.18039216, g: 0.8, b: 0.44313726, a: 0}
+  displayColor: {r: 0.18039216, g: 0.8, b: 0.44313726, a: 1}
   isImplemented: 1
   funFact: Burns bright white. Used in fireworks.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

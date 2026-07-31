@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 4
   electrons: 3
   elementGroup: 0
-  displayColor: {r: 1, g: 0.41960785, b: 0.41960785, a: 0}
+  displayColor: {r: 1, g: 0.41960785, b: 0.41960785, a: 1}
   isImplemented: 1
   funFact: Lightest metal. Reacts with water.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

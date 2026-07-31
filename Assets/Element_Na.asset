@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 12
   electrons: 11
   elementGroup: 0
-  displayColor: {r: 0.60784316, g: 0.34901962, b: 0.7137255, a: 0}
+  displayColor: {r: 0.60784316, g: 0.34901962, b: 0.7137255, a: 1}
   isImplemented: 1
   funFact: Explodes in water. Essential for nerves.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

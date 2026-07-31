@@ -19,7 +19,8 @@ MonoBehaviour:
   neutrons: 20
   electrons: 20
   elementGroup: 1
-  displayColor: {r: 0.15294118, g: 0.68235296, b: 0.3764706, a: 0}
+  displayColor: {r: 0.15294118, g: 0.68235296, b: 0.3764706, a: 1}
   isImplemented: 1
   funFact: Builds bones and teeth. Most abundant metal in body.
+  noReactionReason: 
   atomModelPrefab: {fileID: 0}

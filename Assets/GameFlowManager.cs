@@ -28,14 +28,22 @@ public class GameFlowManager : MonoBehaviour
         Instance = this;
     }
 
-    void Start() => SetStage(Stage.Welcome);
+    void Start()
+    {
+        // Only hide non-welcome objects — WelcomeScreenManager controls the welcome canvas itself
+        periodicTableBoard?.SetActive(false);
+        workbenchArea?.SetActive(false);
+        if (continueButton != null) continueButton.SetActive(false);
+        currentStage = Stage.Welcome;
+    }
 
-    public void SetStage(Stage newStage)
+public void SetStage(Stage newStage)
     {
         currentStage = newStage;
-        welcomeCanvas?.SetActive(newStage == Stage.Welcome);
+
         periodicTableBoard?.SetActive(newStage == Stage.ElementSelect);
         workbenchArea?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
+<<<<<<< HEAD
         continueButton?.SetActive(false);
         backButton?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
         
@@ -43,11 +51,33 @@ public class GameFlowManager : MonoBehaviour
         {
             if (currentStage == Stage.Welcome) 
                 selectedElementA = null;
+=======
+        if (continueButton != null) continueButton.SetActive(false);
+
+        if (newStage == Stage.ElementSelect)
+        {
+            selectedElementA = null;
+            if (infoSlab != null && !infoSlab.activeSelf)
+                infoSlab.SetActive(true);
+>>>>>>> 298b435e07ca275f2614bb0a87dfae3186e1cdb1
             infoSlab?.GetComponent<InfoSlabFollower>()?.ResetSelection();
         }
+
         if (newStage == Stage.ReactionExperiment)
         {
+            // Hide info slab when going to workbench
+            var slabFollower = infoSlab?.GetComponent<InfoSlabFollower>();
+            if (slabFollower != null) slabFollower.Hide();
+            else if (infoSlab != null) infoSlab.SetActive(false);
+
             ReactionWorkbench.Instance?.PrepareElementA(selectedElementA);
+        }
+
+        if (newStage == Stage.Result)
+        {
+            // Keep workbench visible, hide slab
+            var slabFollower = infoSlab?.GetComponent<InfoSlabFollower>();
+            if (slabFollower != null) slabFollower.Hide();
         }
     }
 

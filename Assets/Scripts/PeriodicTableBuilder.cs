@@ -18,12 +18,16 @@ public class PeriodicTableBuilder : MonoBehaviour
     public float activeGlowAlpha = 1f;
 
 
+<<<<<<< HEAD
     void Start()
 {
     Debug.Log("BUILD TABLE STARTING");
     BuildTable();
 }
     public void BuildTable()
+=======
+public void BuildTable()
+>>>>>>> 298b435e07ca275f2614bb0a87dfae3186e1cdb1
     {
         foreach (Transform child in gridParent)
             Destroy(child.gameObject);
@@ -48,21 +52,23 @@ public class PeriodicTableBuilder : MonoBehaviour
             var button = go.GetComponent<Button>();
 
             ElementData data = elementLookup.ContainsKey(i) ? elementLookup[i] : null;
-            
+
             if (data != null && data.isImplemented)
             {
-                btn.elementData = data;
-                button.interactable = true;
-                image.color = data.displayColor;
+                if (btn != null) btn.elementData = data;
+                if (button != null) button.interactable = true;
+                if (image != null) image.color = data.displayColor;
             }
             else
             {
-                button.interactable = false;
-                image.color = lockedColor;
+                if (button != null) button.interactable = false;
+                if (image != null) image.color = lockedColor;
             }
 
+            // Show symbol if available, else atomic number
             var text = go.GetComponentInChildren<Text>();
-            if (text != null) text.text = i.ToString();
+            if (text != null)
+                text.text = (data != null) ? data.symbol : i.ToString();
         }
     }
 

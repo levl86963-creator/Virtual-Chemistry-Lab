@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
+
 public class ReactionWorkbench : MonoBehaviour
 {
     public static ReactionWorkbench Instance;
-    
+
     [Header("Slots")]
     public Transform slotA;
     public Transform slotB;
@@ -18,53 +19,124 @@ public class ReactionWorkbench : MonoBehaviour
 
     [Header("Effects")]
     public ParticleSystem reactionParticles;
-    public AudioClip reactionSound;
-    public AudioClip failSound;
+    public AudioSource audioSource;
 
     [Header("UI")]
     public GameObject floatingTextPrefab;
-    public GameObject infoCardPrefab;
 
-    void Awake() => Instance = this;
-
-    public void PrepareElementA(ElementData data)
+    void Awake()
     {
-        if (data == null || data.atomModelPrefab == null) return;
-        ClearSlots();
-        currentAtomA = Instantiate(data.atomModelPrefab, slotA.position, Quaternion.identity);
-        currentAtomA.GetComponent<AtomModel>().data = data;
+        Instance = this;
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
     }
 
+    // ── Called by GameFlowManager when entering ReactionExperiment stage ──────
+public void PrepareElementA(ElementData data)
+    {
+        if (data == null)
+        {
+            Debug.LogWarning("[ReactionWorkbench] PrepareElementA: data is null.");
+            return;
+        }
+        ClearSlots();
+
+        if (data.atomModelPrefab != null)
+        {
+            currentAtomA = Instantiate(data.atomModelPrefab, slotA.position, Quaternion.identity);
+            var model = currentAtomA.GetComponent<AtomModel>();
+            if (model != null) model.data = data;
+        }
+        else
+        {
+            // Fallback: spawn a colored sphere labeled with the element symbol
+            currentAtomA = UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Sphere);
+            currentAtomA.transform.position = slotA.position;
+            currentAtomA.transform.localScale = Vector3.one * 0.15f;
+            var rend = currentAtomA.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                var mat = new Material(rend.sharedMaterial);
+                mat.color = new Color(data.displayColor.r, data.displayColor.g, data.displayColor.b, 1f);
+                rend.material = mat;
+            }
+            // Add AtomModel so TryReaction can read the data
+            var atomModel = currentAtomA.GetComponent<AtomModel>();
+            if (atomModel == null) atomModel = currentAtomA.AddComponent<AtomModel>();
+            atomModel.data = data;
+
+            // Add XRGrabInteractable so player can pick it up
+            var rb = currentAtomA.GetComponent<Rigidbody>();
+            if (rb == null) rb = currentAtomA.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            if (currentAtomA.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>() == null)
+                currentAtomA.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        }
+    }
+
+    // ── Called when an atom is physically dropped into a slot ────────────────
     public void OnAtomDroppedInSlot(GameObject atom, string slotName)
     {
-        if (slotName == "A") currentAtomA = atom;
-        if (slotName == "B") currentAtomB = atom;
-        
+        if (slotName == "A") { currentAtomA = atom; atom.transform.position = slotA.position; }
+        if (slotName == "B") { currentAtomB = atom; atom.transform.position = slotB.position; }
+
         if (currentAtomA != null && currentAtomB != null)
             StartCoroutine(TryReaction());
     }
 
+    // ── Reaction logic ────────────────────────────────────────────────────────
     IEnumerator TryReaction()
     {
-        ElementData a = currentAtomA.GetComponent<AtomModel>().data;
-        ElementData b = currentAtomB.GetComponent<AtomModel>().data;
-        
-        CompoundData result = ReactionDatabase.Instance?.GetReaction(a, b);
-        
-        if (result != null)
+        ElementData a = currentAtomA?.GetComponent<AtomModel>()?.data;
+        ElementData b = currentAtomB?.GetComponent<AtomModel>()?.data;
+
+        if (a == null || b == null)
         {
+            Debug.LogWarning("[ReactionWorkbench] One or both atoms missing ElementData.");
+            yield break;
+        }
+
+        ReactionRecipe recipe = ReactionDatabase.Instance?.GetReaction(a, b);
+
+        if (recipe != null)
+        {
+            // Animate atoms together
             yield return StartCoroutine(AnimateAtomsToCenter());
-            reactionParticles?.Play();
-            Destroy(currentAtomA); Destroy(currentAtomB);
-            currentAtomA = null; currentAtomB = null;
-            
-            GameObject compound = Instantiate(result.compoundPrefab, resultSpawnPoint.position, Quaternion.identity);
-            ShowInfoCard(result);
+
+            // Effects
+            if (recipe.reactionSound != null)
+                audioSource.PlayOneShot(recipe.reactionSound);
+
+            if (reactionParticles != null)
+                reactionParticles.Play();
+
+            // Spawn visual effects from recipe
+            if (recipe.gasBubbleEffectPrefab != null)
+                Instantiate(recipe.gasBubbleEffectPrefab, reactionCenter.position, Quaternion.identity);
+
+            if (recipe.sparkEffectPrefab != null)
+                Instantiate(recipe.sparkEffectPrefab, reactionCenter.position, Quaternion.identity);
+
+            // Destroy reactant atoms
+            Destroy(currentAtomA);
+            Destroy(currentAtomB);
+            currentAtomA = null;
+            currentAtomB = null;
+
+            // Show product description as floating text
+            if (!string.IsNullOrEmpty(recipe.productDescription))
+                ShowFloatingText(recipe.productDescription);
+
+            // Tell GameFlowManager the reaction succeeded
+            GameFlowManager.Instance?.SetStage(GameFlowManager.Stage.Result);
         }
         else
         {
-            ShakeAtom(currentAtomA); ShakeAtom(currentAtomB);
-            ShowFloatingText(ReactionDatabase.Instance?.GetNoReactionText(a, b));
+            // No reaction — shake and bounce back
+            ShakeAtom(currentAtomA);
+            ShakeAtom(currentAtomB);
+            string msg = ReactionDatabase.Instance?.GetNoReactionText(a, b) ?? "No reaction.";
+            ShowFloatingText(msg);
             yield return new WaitForSeconds(3f);
             ClearSlotBOnly();
         }
@@ -79,8 +151,8 @@ public class ReactionWorkbench : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = elapsed / reactionDuration;
-            currentAtomA.transform.position = Vector3.Lerp(startA, reactionCenter.position, t);
-            currentAtomB.transform.position = Vector3.Lerp(startB, reactionCenter.position, t);
+            if (currentAtomA != null) currentAtomA.transform.position = Vector3.Lerp(startA, reactionCenter.position, t);
+            if (currentAtomB != null) currentAtomB.transform.position = Vector3.Lerp(startB, reactionCenter.position, t);
             yield return null;
         }
     }
@@ -93,34 +165,28 @@ public class ReactionWorkbench : MonoBehaviour
 
     IEnumerator ShakeCoroutine(GameObject atom)
     {
-        Vector3 originalPos = atom.transform.position;
+        Vector3 orig = atom.transform.position;
         float elapsed = 0f;
         while (elapsed < 0.5f)
         {
             if (atom == null) yield break;
             elapsed += Time.deltaTime;
-            atom.transform.position = originalPos + Random.insideUnitSphere * 0.02f;
+            atom.transform.position = orig + Random.insideUnitSphere * 0.02f;
             yield return null;
         }
-        if (atom != null) atom.transform.position = originalPos;
+        if (atom != null) atom.transform.position = orig;
     }
 
     void ShowFloatingText(string text)
     {
-        if (floatingTextPrefab == null) return;
+        if (floatingTextPrefab == null || resultSpawnPoint == null) return;
         var go = Instantiate(floatingTextPrefab, resultSpawnPoint.position + Vector3.up * 0.3f, Quaternion.identity);
         var tmp = go.GetComponentInChildren<TextMeshPro>();
         if (tmp != null) tmp.text = text;
         Destroy(go, 4f);
     }
 
-    void ShowInfoCard(CompoundData data)
-    {
-        if (infoCardPrefab == null) return;
-        Instantiate(infoCardPrefab, resultSpawnPoint.position + Vector3.up * 0.5f, Quaternion.identity);
-    }
-
-    void ClearSlotBOnly()
+    public void ClearSlotBOnly()
     {
         if (currentAtomB != null) { Destroy(currentAtomB); currentAtomB = null; }
     }
