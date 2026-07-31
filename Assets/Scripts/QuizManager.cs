@@ -35,6 +35,10 @@ public class QuizManager : MonoBehaviour
     public GameObject startExperimentingButtonObject;
     public float revealScaleDuration = 0.4f;
 
+    public Transform playerOrigin;
+    public Vector3 quizStartPosition = new Vector3(-2f, 0f, 3f);
+    public Vector3 quizStartEulerAngles = Vector3.zero;
+
     private readonly List<QuizQuestion> questionSequence = new();
     private QuizQuestion currentQuestion;
     private int currentQuestionIndex;
@@ -70,7 +74,7 @@ public class QuizManager : MonoBehaviour
         }
 
         if (enterQuizButton != null)
-            enterQuizButton.onClick.AddListener(OnEnterQuizClicked);
+            enterQuizButton.onClick.AddListener(OpenQuiz);
         if (continueButton != null)
             continueButton.onClick.AddListener(OnContinueClicked);
         if (quitButton != null)
@@ -92,9 +96,15 @@ public class QuizManager : MonoBehaviour
             enterQuizButtonObject.SetActive(true);
     }
 
-    private void OnEnterQuizClicked()
+    /// <summary>
+    /// Resets the player to the configured spawn point before starting the quiz.
+    /// </summary>
+    public void OpenQuiz()
     {
         questionSequence.Clear();
+
+        RespawnPlayerAtStart();
+
         score = 0;
         questionsAnswered = 0;
         currentQuestionIndex = 0;
@@ -135,6 +145,28 @@ public class QuizManager : MonoBehaviour
         if (mainboardObject != null)
             mainboardObject.SetActive(false);
         ShowQuestionAt(0);
+    }
+
+    /// <summary>
+    /// Moves the XR origin to the quiz spawn point without changing the button position.
+    /// </summary>
+    public void RespawnPlayerAtStart()
+    {
+        if (playerOrigin == null)
+        {
+            Debug.LogWarning("[QuizManager] Player origin is not assigned; quiz opened without respawning.");
+            return;
+        }
+
+        CharacterController characterController = playerOrigin.GetComponent<CharacterController>();
+        if (characterController != null)
+            characterController.enabled = false;
+
+        playerOrigin.SetPositionAndRotation(quizStartPosition, Quaternion.Euler(quizStartEulerAngles));
+        Debug.Log($"[QuizManager] Player respawned at {quizStartPosition} before opening the quiz.");
+
+        if (characterController != null)
+            characterController.enabled = true;
     }
 
     private void ShowQuestionAt(int index)
