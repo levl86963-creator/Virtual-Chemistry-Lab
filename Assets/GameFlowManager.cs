@@ -31,8 +31,8 @@ public class GameFlowManager : MonoBehaviour
     void Start()
     {
         // Only hide non-welcome objects — WelcomeScreenManager controls the welcome canvas itself
-        periodicTableBoard?.SetActive(false);
-        workbenchArea?.SetActive(false);
+        if (periodicTableBoard != null) periodicTableBoard.SetActive(false);
+        if (workbenchArea != null) workbenchArea.SetActive(false);
         if (continueButton != null) continueButton.SetActive(false);
         currentStage = Stage.Welcome;
     }
@@ -41,34 +41,29 @@ public void SetStage(Stage newStage)
     {
         currentStage = newStage;
 
-        periodicTableBoard?.SetActive(newStage == Stage.ElementSelect);
-        workbenchArea?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
-<<<<<<< HEAD
-        continueButton?.SetActive(false);
-        backButton?.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
-        
-        if (newStage == Stage.ElementSelect)
-        {
-            if (currentStage == Stage.Welcome) 
-                selectedElementA = null;
-=======
+        if (periodicTableBoard != null) periodicTableBoard.SetActive(newStage == Stage.ElementSelect);
+        if (workbenchArea != null) workbenchArea.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
         if (continueButton != null) continueButton.SetActive(false);
+        if (backButton != null) backButton.SetActive(newStage == Stage.ReactionExperiment || newStage == Stage.Result);
 
         if (newStage == Stage.ElementSelect)
         {
-            selectedElementA = null;
+            if (currentStage == Stage.Welcome)
+                selectedElementA = null;
             if (infoSlab != null && !infoSlab.activeSelf)
                 infoSlab.SetActive(true);
->>>>>>> 298b435e07ca275f2614bb0a87dfae3186e1cdb1
-            infoSlab?.GetComponent<InfoSlabFollower>()?.ResetSelection();
+            if (infoSlab != null) infoSlab.GetComponent<InfoSlabFollower>()?.ResetSelection();
         }
 
         if (newStage == Stage.ReactionExperiment)
         {
             // Hide info slab when going to workbench
-            var slabFollower = infoSlab?.GetComponent<InfoSlabFollower>();
-            if (slabFollower != null) slabFollower.Hide();
-            else if (infoSlab != null) infoSlab.SetActive(false);
+            if (infoSlab != null)
+            {
+                var slabFollower = infoSlab.GetComponent<InfoSlabFollower>();
+                if (slabFollower != null) slabFollower.Hide();
+                else infoSlab.SetActive(false);
+            }
 
             ReactionWorkbench.Instance?.PrepareElementA(selectedElementA);
         }
@@ -76,8 +71,11 @@ public void SetStage(Stage newStage)
         if (newStage == Stage.Result)
         {
             // Keep workbench visible, hide slab
-            var slabFollower = infoSlab?.GetComponent<InfoSlabFollower>();
-            if (slabFollower != null) slabFollower.Hide();
+            if (infoSlab != null)
+            {
+                var slabFollower = infoSlab.GetComponent<InfoSlabFollower>();
+                if (slabFollower != null) slabFollower.Hide();
+            }
         }
     }
 
@@ -87,8 +85,8 @@ public void SetStage(Stage newStage)
     {
         if (currentStage != Stage.ElementSelect) return;
         selectedElementA = data;
-        continueButton?.SetActive(true);
-        infoSlab?.GetComponent<InfoSlabFollower>()?.ShowElement(data);
+        if (continueButton != null) continueButton.SetActive(true);
+        if (infoSlab != null) infoSlab.GetComponent<InfoSlabFollower>()?.ShowElement(data);
     }
 
     public void OnContinueToExperiment() => SetStage(Stage.ReactionExperiment);

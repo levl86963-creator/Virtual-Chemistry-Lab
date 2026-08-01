@@ -23,6 +23,15 @@ public class ReactionZone : MonoBehaviour
         {
             StartCoroutine(PlayReaction(match, incoming.gameObject));
         }
+        else
+        {
+            // No matching recipe — display the pair-specific no-reaction / special-case result.
+            string noReactionText = ReactionDatabase.Instance != null
+                ? ReactionDatabase.Instance.GetNoReactionText(incoming.symbol, baseSubstance)
+                : $"No reaction between {incoming.symbol} and {baseSubstance}.";
+
+            Debug.Log("[ReactionZone] RESULT: " + noReactionText);
+        }
     }
 
     private ReactionRecipe FindReaction(string a, string b)

@@ -18,16 +18,13 @@ public class PeriodicTableBuilder : MonoBehaviour
     public float activeGlowAlpha = 1f;
 
 
-<<<<<<< HEAD
     void Start()
-{
-    Debug.Log("BUILD TABLE STARTING");
-    BuildTable();
-}
+    {
+        Debug.Log("BUILD TABLE STARTING");
+        BuildTable();
+    }
+
     public void BuildTable()
-=======
-public void BuildTable()
->>>>>>> 298b435e07ca275f2614bb0a87dfae3186e1cdb1
     {
         foreach (Transform child in gridParent)
             Destroy(child.gameObject);
