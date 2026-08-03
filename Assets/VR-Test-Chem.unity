@@ -4640,8 +4640,9 @@ MonoBehaviour:
   chemistryUIHolder: {fileID: 0}
   periodicTableUI: {fileID: 0}
   bondSystemUI: {fileID: 0}
-  quizSystemUI: {fileID: 0}
+  quizSystemUI: {fileID: 1527268544}
   experimentObjects: []
+  infoSlab: {fileID: 0}
   mainMenuHolder: {fileID: 0}
 --- !u!4 &1104147728
 Transform:

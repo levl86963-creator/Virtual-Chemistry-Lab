@@ -117,7 +117,7 @@ public class MenuController : MonoBehaviour
         SetExperimentObjectsActive(true);
     }
 
-    public void OnStartPeriodicTable()
+public void OnStartPeriodicTable()
     {
         Debug.Log("[MenuController] Starting Periodic Table...");
         if (periodicTableUI == null)
@@ -125,9 +125,13 @@ public class MenuController : MonoBehaviour
             Debug.LogError("[MenuController] Periodic table Canvas reference is missing.");
             return;
         }
-        SelectSystem(periodicTableUI);
-        SetInfoSlabActive(true);
-    }
+        HideAllSystems();
+        HideMenu();
+        periodicTableUI.SetActive(true);
+        foreach (Transform child in periodicTableUI.transform)
+            child.gameObject.SetActive(child.name != "QuizPanel"); // hide quiz, show everything else
+
+        SetInfoSlabActive(true);    }
 
 public void OnStartBond()
     {
@@ -146,20 +150,35 @@ public void OnStartBond()
 public void OnStartQuiz()
     {
         Debug.Log("[MenuController] Starting Quiz...");
+        HideMenu();
 
-        // If a dedicated quiz UI exists, show it
+        // The QuizPanel lives inside the periodic table Canvas.
+        // We need the parent Canvas visible, then show only QuizPanel.
         if (quizSystemUI != null)
         {
-            SelectSystem(quizSystemUI);
+            // Make sure the parent Canvas is active
+            if (quizSystemUI.transform.parent != null)
+                quizSystemUI.transform.parent.gameObject.SetActive(true);
 
-            // Try to find a QuizManager – it's optional, don't error if missing
-            QuizManager quizManager = FindFirstObjectByType<QuizManager>();
+            // Hide other siblings (PeriodicTableBuilder, Mainboard) so only quiz shows
+            if (quizSystemUI.transform.parent != null)
+            {
+                foreach (Transform sibling in quizSystemUI.transform.parent)
+                {
+                    bool isQuizPanel = sibling.gameObject == quizSystemUI;
+                    sibling.gameObject.SetActive(isQuizPanel);
+                }
+            }
+
+            quizSystemUI.SetActive(true);
+
+            // Try to start the quiz session
+            QuizManager quizManager = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include);
             if (quizManager != null)
                 quizManager.OpenQuiz();
             return;
         }
 
-        // No quiz system built yet – stay on menu and show a floating label
         SpawnComingSoon("Start Quiz");
     }
 
@@ -195,13 +214,15 @@ public void OnStartQuiz()
     public void ShowMenu() { if (mainMenuHolder != null) mainMenuHolder.SetActive(true); }
     private void HideMenu() { if (mainMenuHolder != null) mainMenuHolder.SetActive(false); }
 
-    private void HideAllSystems()
+private void HideAllSystems()
     {
         if (chemistryUIHolder != null) chemistryUIHolder.SetActive(false);
+        // Don't hide the periodicTableUI Canvas entirely if QuizPanel lives inside it.
+        // Instead hide it only if we're not already managing its children.
         if (periodicTableUI != null) periodicTableUI.SetActive(false);
         if (bondSystemUI != null) bondSystemUI.SetActive(false);
-        if (quizSystemUI != null) quizSystemUI.SetActive(false);
         SetInfoSlabActive(false);
+        // quizSystemUI is a child of periodicTableUI Canvas, so hiding the canvas covers it.
     }
 
     private void SetInfoSlabActive(bool isActive)
