@@ -10,7 +10,8 @@ public class WelcomeScreenManager : MonoBehaviour
     public TextMeshProUGUI instructionText; // Optional: to pulse/hide
 
     [Header("Lab References")]
-    public GameObject periodicTableBoard;   // Your Canvas or MainBoard
+    public GameObject mainMenuHolder;          // The main menu with 4 buttons
+    public GameObject periodicTableBoard;   // Your Canvas or MainBoard (controlled by menu)
     public GameObject atomSpawnPoint;       // Optional: hide until start
 
     [Header("Timing")]
@@ -30,7 +31,11 @@ public AudioClip startSound;
         fadePanel.alpha = 1f;
         welcomeCanvas.SetActive(true);
 
-        // Hide the periodic table at start
+        // Find and show main menu instead of periodic table
+        if (mainMenuHolder == null)
+            mainMenuHolder = GameObject.Find("MainMenuHolder");
+        
+        // Hide the periodic table at start - menu will control it
         if (periodicTableBoard != null)
             periodicTableBoard.SetActive(false);
 
@@ -76,9 +81,29 @@ public void OnStartButtonClicked()
         // Wait then reveal the board
         yield return new WaitForSeconds(boardRevealDelay);
 
+        // Show the main menu instead of directly showing periodic table
+        if (mainMenuHolder != null)
+        {
+            mainMenuHolder.SetActive(true);
+            
+            // Optional: animate menu scale up
+            mainMenuHolder.transform.localScale = Vector3.zero;
+            float scaleT = 0;
+            while (scaleT < 1)
+            {
+                scaleT += Time.deltaTime * 3f;
+                mainMenuHolder.transform.localScale = Vector3.Lerp(
+                    Vector3.zero,
+                    Vector3.one,
+                    Mathf.SmoothStep(0, 1, scaleT)
+                );
+                yield return null;
+            }
+        }
+        
+        // Keep periodic table hidden - menu buttons will show it
         if (periodicTableBoard != null)
         {
-            periodicTableBoard.SetActive(true);
 
             // Optional: animate board scale up
             periodicTableBoard.transform.localScale = Vector3.zero;

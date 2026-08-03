@@ -92,6 +92,16 @@ void Start()
         }
     }
 
+    /// <summary>
+    /// Shows the default periodic-table prompt immediately when the periodic-table mode opens.
+    /// </summary>
+    public void ShowPeriodicTablePrompt()
+    {
+        hasSelectedElement = true;
+        ShowInitialPrompt();
+    }
+
+
 public void ShowInitialPrompt()
     {
         Debug.Log("[INFO SLAB] ShowInitialPrompt()");
