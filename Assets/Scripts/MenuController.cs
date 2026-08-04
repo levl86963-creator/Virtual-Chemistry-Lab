@@ -131,7 +131,14 @@ public void OnStartPeriodicTable()
         foreach (Transform child in periodicTableUI.transform)
             child.gameObject.SetActive(child.name != "QuizPanel"); // hide quiz, show everything else
 
-        SetInfoSlabActive(true);    }
+        SetInfoSlabActive(true);
+
+        // Keep GameFlowManager's stage in sync so element-selection features that key off
+        // it (Continue button, quiz prep) work correctly, without letting GameFlowManager
+        // re-activate the systems MenuController already owns.
+        if (GameFlowManager.Instance != null)
+            GameFlowManager.Instance.currentStage = GameFlowManager.Stage.ElementSelect;
+    }
 
 public void OnStartBond()
     {
@@ -189,6 +196,11 @@ public void OnStartQuiz()
         SetExperimentObjectsActive(false);
         ResetMenuButtonHighlights();
         ShowMenu();
+
+        // Reset GameFlowManager's stage so stale state (e.g. Continue button) doesn't
+        // leak into the next system chosen from the menu.
+        if (GameFlowManager.Instance != null)
+            GameFlowManager.Instance.currentStage = GameFlowManager.Stage.Welcome;
     }
 
     public void SetSelectedButton(MenuButton3D selectedButton)

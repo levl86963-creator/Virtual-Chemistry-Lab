@@ -91,10 +91,13 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
 
         SpawnAtom(data);
         // Show "Enter Quiz" button for this element
-    if (quizManager != null)
-    {
-    quizManager.PrepareQuizForElement(data);
-    }
+        if (quizManager != null)
+        {
+            quizManager.PrepareQuizForElement(data);
+        }
+
+        // Notify GameFlowManager so it stores the selection and shows ContinueButton
+        GameFlowManager.Instance?.OnElementSelected(data);
     }
 
     private void UpdateInfoPanel(ElementData data)
@@ -248,6 +251,13 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
         if (infoSlab != null)
         {
             infoSlab.Hide();
+        }
+
+        // Reset GameFlowManager selection (hides ContinueButton)
+        if (GameFlowManager.Instance != null)
+        {
+            GameFlowManager.Instance.selectedElementA = null;
+            GameFlowManager.Instance.continueButton?.SetActive(false);
         }
     }
 
