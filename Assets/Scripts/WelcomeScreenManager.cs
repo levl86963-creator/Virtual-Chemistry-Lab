@@ -19,10 +19,10 @@ public class WelcomeScreenManager : MonoBehaviour
     public float boardRevealDelay = 0.3f;
 
     [Header("Audio")]
-    
+
     public AudioClip confirmSound;  // For Start Experimenting button
-    
-public AudioClip startSound;
+
+    public AudioClip startSound;
     private AudioSource audioSource;
 
     void Start()
@@ -34,7 +34,7 @@ public AudioClip startSound;
         // Find and show main menu instead of periodic table
         if (mainMenuHolder == null)
             mainMenuHolder = GameObject.Find("MainMenuHolder");
-        
+
         // Hide the periodic table at start - menu will control it
         if (periodicTableBoard != null)
             periodicTableBoard.SetActive(false);
@@ -49,7 +49,7 @@ public AudioClip startSound;
     }
 
     // Call this from the Start Button's OnClick
-public void OnStartButtonClicked()
+    public void OnStartButtonClicked()
     {
         // Play confirm chord immediately on button press
         if (confirmSound != null)
@@ -81,12 +81,11 @@ public void OnStartButtonClicked()
         // Wait then reveal the board via GameFlowManager (which owns periodicTableBoard)
         yield return new WaitForSeconds(boardRevealDelay);
 
-<<<<<<< HEAD
         // Show the main menu instead of directly showing periodic table
         if (mainMenuHolder != null)
         {
             mainMenuHolder.SetActive(true);
-            
+
             // Optional: animate menu scale up
             mainMenuHolder.transform.localScale = Vector3.zero;
             float scaleT = 0;
@@ -101,7 +100,7 @@ public void OnStartButtonClicked()
                 yield return null;
             }
         }
-        
+
         // Keep periodic table hidden - menu buttons will show it
         if (periodicTableBoard != null)
         {
@@ -120,10 +119,6 @@ public void OnStartButtonClicked()
                 yield return null;
             }
         }
-=======
-        // Hand off to GameFlowManager to show the periodic table
-        GameFlowManager.Instance?.SetStage(GameFlowManager.Stage.ElementSelect);
->>>>>>> sombo
 
         if (atomSpawnPoint != null)
             atomSpawnPoint.SetActive(true);

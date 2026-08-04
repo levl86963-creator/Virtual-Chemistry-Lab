@@ -23,8 +23,8 @@ public class PeriodicTableManager : MonoBehaviour
     public AudioClip elementSelectSound;
     public AudioClip elementDeselectSound;
 
-    
-[Header("Floating Info Slab")]
+
+    [Header("Floating Info Slab")]
     public InfoSlabFollower infoSlab;
     //add
     [Header("Quiz System")]
@@ -42,7 +42,7 @@ public class PeriodicTableManager : MonoBehaviour
         ResetStateOnly();
     }
 
-private void EnsureInfoSlabReference()
+    private void EnsureInfoSlabReference()
     {
         if (infoSlab == null)
         {
@@ -57,7 +57,7 @@ private void EnsureInfoSlabReference()
         }
     }
 
-public void SelectElement(ElementData data, GameObject clickedTile = null)
+    public void SelectElement(ElementData data, GameObject clickedTile = null)
     {
         if (data == null) return;
 
@@ -90,17 +90,15 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
             SetHighlight(clickedTile, data);
 
         SpawnAtom(data);
-<<<<<<< HEAD
+
         // Show "Enter Quiz" button for this element
-    if (quizManager != null)
-    {
-    quizManager.PrepareQuizForElement(data);
-    }
-=======
+        if (quizManager != null)
+        {
+            quizManager.PrepareQuizForElement(data);
+        }
 
         // Notify GameFlowManager so it stores the selection and shows ContinueButton
         GameFlowManager.Instance?.OnElementSelected(data);
->>>>>>> sombo
     }
 
     private void UpdateInfoPanel(ElementData data)
@@ -289,8 +287,8 @@ public void SelectElement(ElementData data, GameObject clickedTile = null)
         src.PlayOneShot(clip, 0.65f);
     }
 
-    
-private void SafeDestroy(GameObject obj)
+
+    private void SafeDestroy(GameObject obj)
     {
         if (obj == null) return;
         if (Application.isPlaying)
