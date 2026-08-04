@@ -78,9 +78,10 @@ public void OnStartButtonClicked()
         // Disable welcome canvas
         welcomeCanvas.SetActive(false);
 
-        // Wait then reveal the board
+        // Wait then reveal the board via GameFlowManager (which owns periodicTableBoard)
         yield return new WaitForSeconds(boardRevealDelay);
 
+<<<<<<< HEAD
         // Show the main menu instead of directly showing periodic table
         if (mainMenuHolder != null)
         {
@@ -119,6 +120,10 @@ public void OnStartButtonClicked()
                 yield return null;
             }
         }
+=======
+        // Hand off to GameFlowManager to show the periodic table
+        GameFlowManager.Instance?.SetStage(GameFlowManager.Stage.ElementSelect);
+>>>>>>> sombo
 
         if (atomSpawnPoint != null)
             atomSpawnPoint.SetActive(true);
