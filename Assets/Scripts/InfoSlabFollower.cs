@@ -52,6 +52,8 @@ public class InfoSlabFollower : MonoBehaviour
     private void OnEnable()
     {
         CacheTextReferences();
+        if (!hasSelectedElement)
+            ApplyDefaultPromptText();
     }
 
     private void CacheTextReferences()
@@ -115,34 +117,40 @@ void Start()
         }
     }
 
-    /// <summary>
-    /// Shows the default periodic-table prompt immediately when the periodic-table mode opens.
-    /// </summary>
-    public void ShowPeriodicTablePrompt()
+    private void ApplyDefaultPromptText()
     {
         CacheTextReferences();
-        hasSelectedElement = true;
-        gameObject.SetActive(true);
 
         string promptElementName = string.IsNullOrWhiteSpace(defaultElementName) ? DefaultPromptElementName : defaultElementName;
         string promptSymbol = string.IsNullOrWhiteSpace(defaultSymbol) ? DefaultPromptSymbol : defaultSymbol;
         string promptAtomicNumber = string.IsNullOrWhiteSpace(defaultAtomicNumber) ? DefaultPromptAtomicNumber : defaultAtomicNumber;
         string promptFunFact = string.IsNullOrWhiteSpace(defaultFunFact) ? DefaultPromptFunFact : defaultFunFact;
 
-        if (elementNameText != null) elementNameText.SetText(promptElementName);
-        if (symbolText != null) symbolText.SetText(promptSymbol);
-        if (atomicNumberText != null) atomicNumberText.SetText(promptAtomicNumber);
-        if (funFactText != null) funFactText.SetText(promptFunFact);
+        elementNameText?.SetText(promptElementName);
+        symbolText?.SetText(promptSymbol);
+        atomicNumberText?.SetText(promptAtomicNumber);
+        funFactText?.SetText(promptFunFact);
 
         elementNameText?.ForceMeshUpdate();
         symbolText?.ForceMeshUpdate();
         atomicNumberText?.ForceMeshUpdate();
         funFactText?.ForceMeshUpdate();
+    }
 
+    /// <summary>
+    /// Shows the default periodic-table prompt immediately when the periodic-table mode opens.
+    /// </summary>
+    public void ShowPeriodicTablePrompt()
+    {
+        hasSelectedElement = true;
+        gameObject.SetActive(true);
+        ApplyDefaultPromptText();
         ShowCanvas();
         SnapToTargetPosition();
         PlaySlabSound();
     }
+
+
 
 
 public void ShowInitialPrompt()
